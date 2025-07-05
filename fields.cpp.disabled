@@ -1,0 +1,183 @@
+#include "konfig.h"
+
+namespace konfig {
+
+template <> bool manager::field<int>(const string &name, int *ptr, const std::optional<int> def) {
+    toml::table *tbl = resolve_current_table();
+    if (!tbl) {
+        errors.push_back(std::format("no valid table for field {}", name));
+        return false;
+    }
+
+    switch (mode) {
+    case mode_enum::load: {
+        if (const auto val = tbl->get(name); val && val->is_integer()) {
+            *ptr = val->as_integer()->get();
+        } else if (def) {
+            *ptr = *def;
+        } else {
+            errors.push_back(std::format("field {} missing or not an integer", name));
+            return false;
+        }
+        break;
+    }
+    case mode_enum::save: {
+        tbl->insert_or_assign(name, *ptr);
+        break;
+    }
+    default:
+        errors.push_back("invalid mode");
+        assert(false && "invalid mode");
+    }
+    return true;
+}
+
+template <>
+bool manager::field<std::string>(const string &name, std::string *ptr,
+                                 const std::optional<std::string> def) {
+    toml::table *tbl = resolve_current_table();
+    if (!tbl) {
+        errors.push_back(std::format("no valid table for field {}", name));
+        return false;
+    }
+
+    switch (mode) {
+    case mode_enum::load: {
+        if (const auto val = tbl->get(name); val && val->is_string()) {
+            *ptr = val->as_string()->get();
+        } else if (def) {
+            *ptr = *def;
+        } else {
+            errors.push_back(std::format("field {} missing or not a string", name));
+            return false;
+        }
+        break;
+    }
+    case mode_enum::save: {
+        tbl->insert_or_assign(name, *ptr);
+        break;
+    }
+    default:
+        errors.push_back("invalid mode");
+        assert(false && "invalid mode");
+    }
+    return true;
+}
+
+template <>
+bool manager::field<bool>(const string &name, bool *ptr, const std::optional<bool> def) {
+    toml::table *tbl = resolve_current_table();
+    if (!tbl) {
+        errors.push_back(std::format("no valid table for field {}", name));
+        return false;
+    }
+
+    switch (mode) {
+    case mode_enum::load: {
+        if (const auto val = tbl->get(name); val && val->is_boolean()) {
+            *ptr = val->as_boolean()->get();
+        } else if (def) {
+            *ptr = *def;
+        } else {
+            errors.push_back(std::format("field {} missing or not a boolean", name));
+            return false;
+        }
+        break;
+    }
+    case mode_enum::save: {
+        tbl->insert_or_assign(name, *ptr);
+        break;
+    }
+    default:
+        errors.emplace_back("invalid mode");
+        assert(false && "invalid mode");
+    }
+    return true;
+}
+
+template <>
+bool manager::field<double>(const string &name, double *ptr, const std::optional<double> def) {
+    toml::table *tbl = resolve_current_table();
+    if (!tbl) {
+        errors.push_back(std::format("no valid table for field {}", name));
+        return false;
+    }
+
+    switch (mode) {
+    case mode_enum::load: {
+        if (const auto val = tbl->get(name); val && val->is_floating_point()) {
+            *ptr = val->as_floating_point()->get();
+        } else if (def) {
+            *ptr = *def;
+        } else {
+            errors.push_back(std::format("field {} missing or not a float", name));
+            return false;
+        }
+        break;
+    }
+    case mode_enum::save: {
+        tbl->insert_or_assign(name, *ptr);
+        break;
+    }
+    default:
+        errors.emplace_back("invalid mode");
+        assert(false && "invalid mode");
+    }
+    return true;
+}
+
+template <>
+bool manager::field<std::string_view>(const std::string &name, std::string_view *ptr,
+                                      const std::optional<std::string_view> def) {
+    toml::table *tbl = resolve_current_table();
+    if (!tbl) {
+        errors.push_back(std::format("no valid table for field {}", name));
+        return false;
+    }
+
+    switch (mode) {
+    case mode_enum::load: {
+        if (const auto val = tbl->get(name); val && val->is_string()) {
+            *ptr = val->as_string()->get();
+        } else if (def) {
+            *ptr = *def;
+        } else {
+            errors.push_back(std::format("field {} missing or not a string", name));
+            return false;
+        }
+        break;
+    }
+    case mode_enum::save: {
+        tbl->insert_or_assign(name, *ptr);
+        break;
+    }
+    default:
+        errors.emplace_back("invalid mode");
+        assert(false && "invalid mode");
+    }
+    return true;
+}
+
+template <>
+bool manager::field<system_clock::time_point>(const std::string &name,
+                                              system_clock::time_point *ptr,
+                                              const std::optional<system_clock::time_point> def) {
+    TODO("unimplemented");
+    return true;
+}
+
+template <>
+bool manager::field<year_month_day>(const std::string &name, year_month_day *ptr,
+                                    const std::optional<year_month_day> def) {
+    TODO("unimplemented");
+    return true;
+}
+
+template <>
+bool manager::field<hh_mm_ss<seconds>>(const std::string &name, hh_mm_ss<seconds> *ptr,
+                                       const std::optional<hh_mm_ss<seconds>> def) {
+    TODO("unimplemented");
+    return true;
+}
+
+} // namespace konfig
